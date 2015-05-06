@@ -4,8 +4,8 @@
 start_db(){
   echo 'export PUBLIC_IP=1.1.1.1'>Profile
   cbd startdb
-  cbd migrate cbdb up
-  if cbd migrate cbdb status|grep "MyBatis Migrations SUCCESS" ; then
+  cbd migrate pcdb up
+  if cbd migrate pcdb status|grep "MyBatis Migrations SUCCESS" ; then
       echo Migration: OK
   else
       echo Migration: ERROR
