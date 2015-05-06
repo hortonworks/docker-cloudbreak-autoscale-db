@@ -20,6 +20,10 @@ db_backup() {
     docker exec  cbreak_pcdb_1 tar cz -C /var/lib/postgresql/data . > release/pcdb-${ver}.tgz
 }
 
+release() {
+    gh-release create sequenceiq/docker-pcdb 0.5.2
+}
+
 main() {
     start_db
     db_backup
