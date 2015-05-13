@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DBNAME=pbdb
+DBNAME=pcdb
 APP_NAME=PERISCOPE
 : ${GITHUB_ACCESS_TOKEN:?"Please create GITHUB_ACCESS_TOKEN on GitHub https://github.com/settings/tokens/new"}
 
