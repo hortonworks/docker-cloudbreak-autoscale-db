@@ -19,7 +19,9 @@ start_db(){
   cbd init
   #cbd pull
 
-  cbd startdb
+  $(cbd env export | grep POSTGRES)
+
+  docker run -d --name cbreak_${DBNAME}_1 postgres:${DOCKER_TAG_POSTGRES}
   cbd migrate ${DBNAME} up
   if cbd migrate ${DBNAME} status|grep "MyBatis Migrations SUCCESS" ; then
       echo Migration: OK
@@ -38,6 +40,7 @@ db_backup() {
 
     mkdir -p release
     docker exec  cbreak_${DBNAME}_1 tar cz -C /var/lib/postgresql/data . > release/${DBNAME}-${ver}.tgz
+    docker rm -f cbreak_${DBNAME}_1 
 }
 
 clean() {
