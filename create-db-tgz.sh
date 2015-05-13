@@ -1,11 +1,27 @@
 #!/bin/bash
 
+DBNAME=pbdb
+APP_NAME=PERISCOPE
+: ${GITHUB_ACCESS_TOKEN:?"Please create GITHUB_ACCESS_TOKEN on GitHub https://github.com/settings/tokens/new"}
+
+setup() {
+  if ! gh-release -v &> /dev/null; then
+    go get github.com/progrium/gh-release
+  fi
+}
 
 start_db(){
+
+  declare ver=${1:? version required}
+
   echo 'export PUBLIC_IP=1.1.1.1'>Profile
+  echo "export DOCKER_TAG_${APP_NAME}=${ver}" >> Profile
+  cbd init
+  #cbd pull
+
   cbd startdb
-  cbd migrate pcdb up
-  if cbd migrate pcdb status|grep "MyBatis Migrations SUCCESS" ; then
+  cbd migrate ${DBNAME} up
+  if cbd migrate ${DBNAME} status|grep "MyBatis Migrations SUCCESS" ; then
       echo Migration: OK
   else
       echo Migration: ERROR
@@ -14,19 +30,41 @@ start_db(){
 }
 
 db_backup() {
-    local ver=$(cbd env export|grep DOCKER_TAG_PERISCOPE|sed "s/.*=//")
+
+    declare ver=${1:? version required}
+
+    # for gracefull shutdown: run another containe with --volumes from
+    # docker exec ${DBNAME} bash -c 'kill -INT $(head -1 /var/lib/postgresql/data/postmaster.pid)'
 
     mkdir -p release
-    docker exec  cbreak_pcdb_1 tar cz -C /var/lib/postgresql/data . > release/pcdb-${ver}.tgz
+    docker exec  cbreak_${DBNAME}_1 tar cz -C /var/lib/postgresql/data . > release/${DBNAME}-${ver}.tgz
+}
+
+clean() {
+    rm -rf Profile *.yml release/
 }
 
 release() {
-    gh-release create sequenceiq/docker-pcdb 0.5.2
+    declare ver=${1:? version required}
+    gh-release create sequenceiq/docker-${DBNAME} "${ver}"
+}
+
+update_dockerfile() {
+    declare ver=${1:? version required}
+
+    sed -i "/^ENV VERSION/ s/[0-9\.]*$/${ver}/" Dockerfile
+    git add Dockerfile
+    git commit -m "Update Dockerfile to v${ver}"
+    git push origin master
 }
 
 main() {
-    start_db
-    db_backup
+    setup
+    clean
+    update_dockerfile "$@"
+    start_db "$@"
+    db_backup "$@"
+    release "$@"
 }
 
 [[ "$0" ==  "$BASH_SOURCE" ]] && main "$@"

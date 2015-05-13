@@ -1,7 +1,10 @@
 FROM postgres:9.4.1
 
-ENV PCDB_VERSION 0.5.3
-ADD https://github.com/sequenceiq/docker-pcdb/releases/download/v${PCDB_VERSION}/pcdb-${PCDB_VERSION}.tgz /initdb/
+ENV DBNAME pcdb
+ENV VERSION 0.5.3
+ENV BACKUP_TGZ /initdb/$DBNAME-$VERSION.tgz
+
+ADD https://github.com/sequenceiq/docker-${DBNAME}/releases/download/v${VERSION}/${DBNAME}-${VERSION}.tgz $BACKUP_TGZ
 ADD /start /
 
 ENTRYPOINT [ "/start" ]
