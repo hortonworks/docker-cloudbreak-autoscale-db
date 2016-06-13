@@ -1,4 +1,4 @@
-IMAGE = hortonworks/cloudbreak-pcdb
+IMAGE = hortonworks/cloudbreak-autoscale-db
 TAG = $(shell git  describe --tags --abbrev=0)
 UNAME = $(shell uname)
 
