@@ -3,7 +3,7 @@ MAINTAINER Hortonworks
 
 ENV REPONAME cloudbreak-autoscale-db
 ENV DBNAME pcdb
-ENV VERSION 1.10.0-rc.6
+ENV VERSION 1.10.0-rc.12
 ENV BACKUP_TGZ /initdb/$DBNAME-$VERSION.tgz
 
 ADD https://github.com/hortonworks/docker-${REPONAME}/releases/download/v${VERSION}/${DBNAME}-${VERSION}.tgz $BACKUP_TGZ
